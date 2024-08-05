@@ -1,11 +1,11 @@
 const express = require('express');
 const { check, validationResult } = require('express-validator');
-const auth = require('../middleware/auth');
 const Appointment = require('../models/Appointment');
+const auth = require('../middleware/authMiddleware');
 
 const router = express.Router();
 
-// Create an appointment
+// Create a new appointment
 router.post(
     '/',
     [
@@ -14,7 +14,6 @@ router.post(
             check('date', 'Date is required').not().isEmpty(),
             check('time', 'Time is required').not().isEmpty(),
             check('name', 'Name is required').not().isEmpty(),
-            check('status', 'Status is required').isIn(['Active', 'Upcoming', 'Completed']),
         ],
     ],
     async (req, res) => {
@@ -34,6 +33,7 @@ router.post(
             });
 
             const appointment = await newAppointment.save();
+
             res.json(appointment);
         } catch (err) {
             console.error(err.message);
@@ -45,7 +45,7 @@ router.post(
 // Get all appointments
 router.get('/', auth, async (req, res) => {
     try {
-        const appointments = await Appointment.find().sort({ date: -1 });
+        const appointments = await Appointment.find();
         res.json(appointments);
     } catch (err) {
         console.error(err.message);
@@ -57,6 +57,7 @@ router.get('/', auth, async (req, res) => {
 router.put('/:id', auth, async (req, res) => {
     const { date, time, name, status } = req.body;
 
+    // Build appointment object
     const appointmentFields = {};
     if (date) appointmentFields.date = date;
     if (time) appointmentFields.time = time;
@@ -84,11 +85,11 @@ router.put('/:id', auth, async (req, res) => {
 // Delete an appointment
 router.delete('/:id', auth, async (req, res) => {
     try {
-        const appointment = await Appointment.findById(req.params.id);
+        let appointment = await Appointment.findById(req.params.id);
 
         if (!appointment) return res.status(404).json({ msg: 'Appointment not found' });
 
-        await Appointment.findByIdAndRemove(req.params.id);
+        await Appointment.findByIdAndDelete(req.params.id);
 
         res.json({ msg: 'Appointment removed' });
     } catch (err) {

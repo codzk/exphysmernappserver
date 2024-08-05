@@ -2,33 +2,35 @@ const mongoose = require('mongoose');
 const bcrypt = require('bcryptjs');
 const dotenv = require('dotenv');
 const Admin = require('./models/Admin');
-const connectDB = require('./config/db');
 
 dotenv.config();
-connectDB();
+
+mongoose.connect(process.env.MONGO_URI, {
+    useNewUrlParser: true,
+    useUnifiedTopology: true,
+})
+.then(() => console.log('MongoDB connected successfully'))
+.catch((err) => console.log('MongoDB connection error:', err));
 
 const seedAdmin = async () => {
-    try {
-        let admin = await Admin.findOne({ email: 'admin@example.com' });
-        if (!admin) {
-            const salt = await bcrypt.genSalt(10);
-            const hashedPassword = await bcrypt.hash('password123', salt);
-
-            admin = new Admin({
-                email: 'admin@example.com',
-                password: hashedPassword,
-            });
-
-            await admin.save();
-            console.log('Admin user created');
-        } else {
-            console.log('Admin user already exists');
-        }
+    const existingAdmin = await Admin.findOne({ email: 'admin@example.com' });
+    if (existingAdmin) {
+        console.log('Admin user already exists');
         process.exit();
-    } catch (err) {
-        console.error(err);
-        process.exit(1);
     }
+
+    const hashedPassword = await bcrypt.hash('adminpassword', 10);
+    const admin = new Admin({
+        email: 'admin@example.com',
+        password: hashedPassword,
+    });
+
+    await admin.save();
+    console.log('Admin user created successfully');
+    process.exit();
 };
 
-seedAdmin();
+seedAdmin().catch((err) => {
+    console.error('Seeder error:', err);
+    process.exit(1);
+});
