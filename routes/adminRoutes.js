@@ -5,6 +5,7 @@ const jwt = require('jsonwebtoken');
 const Admin = require('../models/Admin');
 const auth = require('../middleware/authMiddleware');
 
+// Admin login
 router.post('/login', async (req, res) => {
   const { email, password } = req.body;
   try {
@@ -25,6 +26,7 @@ router.post('/login', async (req, res) => {
   }
 });
 
+// Admin dashboard route (protected)
 router.get('/dashboard', auth, (req, res) => {
   res.send('Admin dashboard');
 });
