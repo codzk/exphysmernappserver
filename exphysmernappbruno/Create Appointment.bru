@@ -6,6 +6,25 @@ meta {
 
 post {
   url: http://localhost:5001/api/appointments
-  body: none
-  auth: none
+  body: json
+  auth: bearer
+}
+
+headers {
+  Authorization: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJhZG1pbklkIjoiNjZhY2QxMzNlYTNkMDdmYmYzYTgyNzRhIiwiaWF0IjoxNzIzMDM5NzUwLCJleHAiOjE3MjMwNDMzNTB9.O5KD_8Sx2ezQEgw0OsTsmIszZttQNJT11mRqYs_vHBA
+  Content-Type: application/json
+}
+
+auth:bearer {
+  token: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJhZG1pbklkIjoiNjZhY2QxMzNlYTNkMDdmYmYzYTgyNzRhIiwiaWF0IjoxNzIzMDM5NDk4LCJleHAiOjE3MjMwNDMwOTh9.9MC5CeOa0wW91sGwExarFHfytiKauAhbrD_VRuIYoQo
+}
+
+body:json {
+  {
+      "date": "2024-08-01",
+      "time": "10:00 AM",
+      "name": "John Doe",
+      "status": "Upcoming"
+  }
+  
 }

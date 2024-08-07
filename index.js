@@ -1,33 +1,31 @@
 const express = require('express');
 const mongoose = require('mongoose');
-const cors = require('cors');
 const dotenv = require('dotenv');
-const connectDB = require('./config/db');
+const adminRoutes = require('./routes/adminRoutes');
+const appointmentRoutes = require('./routes/appointmentRoutes');
 
-// Load environment variables
 dotenv.config();
 
-// Initialize Express
 const app = express();
 
-// Connect to MongoDB
-connectDB();
-
-// Middleware
 app.use(express.json());
-app.use(cors());
 
-// Routes
-app.use('/api/appointments', require('./routes/appointmentRoutes'));
-app.use('/api/admin', require('./routes/adminRoutes'));
+app.use('/api/admin', adminRoutes);
+app.use('/api/appointments', appointmentRoutes);
 
-// Error handling middleware
-app.use((err, req, res, next) => {
-    console.error(err.message);
-    if (!err.statusCode) err.statusCode = 500;
-    res.status(err.statusCode).send(err.message);
-});
+const PORT = process.env.PORT || 5000;
 
-// Start the server
-const PORT = process.env.PORT || 5001;
-app.listen(PORT, () => console.log(`Server started on port ${PORT}`));
+mongoose
+  .connect(process.env.MONGO_URI, {
+    useNewUrlParser: true,
+    useUnifiedTopology: true,
+  })
+  .then(() => {
+    console.log('MongoDB connected successfully');
+    app.listen(PORT, () => {
+      console.log(`Server started on port ${PORT}`);
+    });
+  })
+  .catch((err) => {
+    console.error('MongoDB connection error:', err);
+  });

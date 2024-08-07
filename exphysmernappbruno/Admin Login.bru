@@ -5,7 +5,23 @@ meta {
 }
 
 post {
-  url: http://localhost:5001/api/admin/login
-  body: none
+  url: https://exphysmernapp-3b321b248b56.herokuapp.com/
+  body: json
   auth: none
+}
+
+body:json {
+  {
+      "email": "admin@example.com",
+      "password": "password123"
+  }
+  
+}
+
+docs {
+  {
+      "email": "admin@example.com",
+      "password": "password123"
+  }
+  
 }

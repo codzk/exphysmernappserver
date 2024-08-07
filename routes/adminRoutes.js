@@ -1,58 +1,51 @@
 const express = require('express');
+const router = express.Router();
 const bcrypt = require('bcryptjs');
 const jwt = require('jsonwebtoken');
-const { check, validationResult } = require('express-validator');
 const Admin = require('../models/Admin');
+const auth = require('../middleware/authMiddleware');
 
-const router = express.Router();
+// Admin registration
+router.post('/register', async (req, res) => {
+  const { email, password } = req.body;
+  try {
+    const existingAdmin = await Admin.findOne({ email });
+    if (existingAdmin) {
+      return res.status(400).json({ message: 'Admin already exists' });
+    }
+    const admin = new Admin({ email, password });
+    await admin.save();
+    res.status(201).json({ message: 'Admin registered successfully' });
+  } catch (error) {
+    res.status(500).json({ message: 'Server error' });
+  }
+});
 
 // Admin login
-router.post(
-    '/login',
-    [
-        check('email', 'Please include a valid email').isEmail(),
-        check('password', 'Password is required').exists(),
-    ],
-    async (req, res, next) => {
-        const errors = validationResult(req);
-        if (!errors.isEmpty()) {
-            return res.status(400).json({ errors: errors.array() });
-        }
-
-        const { email, password } = req.body;
-
-        try {
-            let admin = await Admin.findOne({ email });
-
-            if (!admin) {
-                return res.status(400).json({ msg: 'Invalid Credentials' });
-            }
-
-            const isMatch = await bcrypt.compare(password, admin.password);
-
-            if (!isMatch) {
-                return res.status(400).json({ msg: 'Invalid Credentials' });
-            }
-
-            const payload = {
-                user: {
-                    id: admin.id,
-                },
-            };
-
-            jwt.sign(
-                payload,
-                process.env.JWT_SECRET,
-                { expiresIn: '5 days' },
-                (err, token) => {
-                    if (err) throw err;
-                    res.json({ token });
-                }
-            );
-        } catch (err) {
-            next(err);
-        }
+router.post('/login', async (req, res) => {
+  const { email, password } = req.body;
+  try {
+    const admin = await Admin.findOne({ email });
+    if (!admin) {
+      return res.status(400).json({ message: 'Invalid credentials' });
     }
-);
+    const isMatch = await bcrypt.compare(password, admin.password);
+    if (!isMatch) {
+      return res.status(400).json({ message: 'Invalid credentials' });
+    }
+    const token = jwt.sign({ adminId: admin._id }, process.env.JWT_SECRET, {
+      expiresIn: '1h',
+    });
+    res.json({ token });
+  } catch (error) {
+    res.status(500).json({ message: 'Server error' });
+  }
+});
+
+
+// Admin dashboard route (protected)
+router.get('/dashboard', auth, (req, res) => {
+  res.send('Admin dashboard');
+});
 
 module.exports = router;
