@@ -1,36 +1,31 @@
 const express = require('express');
 const mongoose = require('mongoose');
-const dotenv = require('dotenv');
 const cors = require('cors');
+const dotenv = require('dotenv');
+const adminRoutes = require('./routes/adminRoutes');
+const appointmentRoutes = require('./routes/appointmentRoutes');
 
 dotenv.config();
 
 const app = express();
 
+// Middleware
 app.use(express.json());
-
-
-const corsOptions = {
-    origin: ['http://localhost:3000', 'https://exphysmernapp.netlify.app'],
-    optionsSuccessStatus: 200
-};
-
-app.use(cors(corsOptions));
+app.use(cors({
+    origin: 'https://exphysmernapp.netlify.app' // Your frontend URL
+}));
 
 // Routes
-const adminRoutes = require('./routes/adminRoutes');
-const appointmentRoutes = require('./routes/appointmentRoutes');
-
 app.use('/api/admin', adminRoutes);
 app.use('/api/appointments', appointmentRoutes);
 
-const PORT = process.env.PORT || 5001;
+// Connect to MongoDB
 mongoose.connect(process.env.MONGO_URI, {
     useNewUrlParser: true,
-    useUnifiedTopology: true
+    useUnifiedTopology: true,
 })
-    .then(() => {
-        console.log('MongoDB connected successfully');
-        app.listen(PORT, () => console.log(`Server started on port ${PORT}`));
-    })
-    .catch(err => console.error('MongoDB connection error:', err));
+.then(() => console.log('MongoDB connected successfully'))
+.catch((err) => console.log('MongoDB connection error:', err));
+
+const PORT = process.env.PORT || 5001;
+app.listen(PORT, () => console.log(`Server started on port ${PORT}`));
