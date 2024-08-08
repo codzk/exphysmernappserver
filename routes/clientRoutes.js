@@ -1,12 +1,11 @@
 const express = require('express');
 const router = express.Router();
 const Client = require('../models/Client');
-const auth = require('../middleware/authMiddleware');
 const mongoose = require('mongoose');
 const ObjectId = mongoose.Types.ObjectId;
 
 // Create a new client
-router.post('/', auth, async (req, res) => {
+router.post('/', async (req, res) => {
     console.log('POST /api/clients route hit'); // Log for debugging
     try {
         const { name, dob, contactNumber, gp } = req.body;
@@ -25,7 +24,7 @@ router.post('/', auth, async (req, res) => {
 });
 
 // Get all clients
-router.get('/', auth, async (req, res) => {
+router.get('/', async (req, res) => {
     try {
         const clients = await Client.find();
         res.json(clients);
@@ -35,7 +34,7 @@ router.get('/', auth, async (req, res) => {
 });
 
 // Get a single client by ID
-router.get('/:id', auth, async (req, res) => {
+router.get('/:id', async (req, res) => {
     try {
         const client = await Client.findById(req.params.id);
         if (!client) {
@@ -48,7 +47,7 @@ router.get('/:id', auth, async (req, res) => {
 });
 
 // Update a client by ID
-router.put('/:id', auth, async (req, res) => {
+router.put('/:id', async (req, res) => {
     const { name, dob, contactNumber, gp } = req.body;
     try {
         let client = await Client.findById(req.params.id);
@@ -67,7 +66,7 @@ router.put('/:id', auth, async (req, res) => {
 });
 
 // Delete a client by ID
-router.delete('/:id', auth, async (req, res) => {
+router.delete('/:id', async (req, res) => {
     try {
         const { id } = req.params;
 
