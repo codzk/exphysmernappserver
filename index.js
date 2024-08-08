@@ -13,7 +13,7 @@ app.use(express.json());
 
 // CORS configuration
 app.use(cors({
-  origin: 'https://exphysmernapp.netlify.app',
+  origin: process.env.FRONTEND_URL || 'https://exphysmernapp.netlify.app',
   methods: ['GET', 'POST', 'PUT', 'DELETE'],
   allowedHeaders: ['Content-Type', 'Authorization']
 }));
@@ -24,9 +24,12 @@ app.use('/api/appointments', require('./routes/appointmentRoutes'));
 app.use('/api/clients', require('./routes/clientRoutes'));
 
 // MongoDB connection
-mongoose.connect(process.env.MONGO_URI)
+mongoose.connect(process.env.MONGO_URI, { useNewUrlParser: true, useUnifiedTopology: true })
   .then(() => console.log('MongoDB connected successfully'))
-  .catch((err) => console.log('MongoDB connection error:', err));
+  .catch((err) => {
+    console.error('MongoDB connection error:', err);
+    process.exit(1); // Exit process with failure
+  });
 
 // Error handling middleware
 app.use(errorHandler);

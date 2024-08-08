@@ -11,6 +11,7 @@ router.post('/', auth, async (req, res) => {
         const client = await newClient.save();
         res.status(201).json(client);
     } catch (error) {
+        console.error('Error creating client:', error);
         res.status(500).json({ message: 'Server error' });
     }
 });
@@ -21,6 +22,7 @@ router.get('/', auth, async (req, res) => {
         const clients = await Client.find();
         res.json(clients);
     } catch (error) {
+        console.error('Error fetching clients:', error);
         res.status(500).json({ message: 'Server error' });
     }
 });
@@ -34,6 +36,7 @@ router.get('/:id', auth, async (req, res) => {
         }
         res.json(client);
     } catch (error) {
+        console.error('Error fetching client:', error);
         res.status(500).json({ message: 'Server error' });
     }
 });
@@ -46,13 +49,14 @@ router.put('/:id', auth, async (req, res) => {
         if (!client) {
             return res.status(404).json({ message: 'Client not found' });
         }
-        client.name = name;
-        client.dob = dob;
-        client.contactNumber = contactNumber;
-        client.gp = gp;
+        client.name = name || client.name;
+        client.dob = dob || client.dob;
+        client.contactNumber = contactNumber || client.contactNumber;
+        client.gp = gp || client.gp;
         await client.save();
         res.json(client);
     } catch (error) {
+        console.error('Error updating client:', error);
         res.status(500).json({ message: 'Server error' });
     }
 });
@@ -67,6 +71,7 @@ router.delete('/:id', auth, async (req, res) => {
         await client.remove();
         res.json({ message: 'Client removed' });
     } catch (error) {
+        console.error('Error deleting client:', error);
         res.status(500).json({ message: 'Server error' });
     }
 });
