@@ -11,7 +11,6 @@ router.post('/', auth, async (req, res) => {
         const client = await newClient.save();
         res.status(201).json(client);
     } catch (error) {
-        console.error('Error creating client:', error);
         res.status(500).json({ message: 'Server error' });
     }
 });
@@ -22,7 +21,6 @@ router.get('/', auth, async (req, res) => {
         const clients = await Client.find();
         res.json(clients);
     } catch (error) {
-        console.error('Error fetching clients:', error);
         res.status(500).json({ message: 'Server error' });
     }
 });
@@ -36,7 +34,6 @@ router.get('/:id', auth, async (req, res) => {
         }
         res.json(client);
     } catch (error) {
-        console.error('Error fetching client:', error);
         res.status(500).json({ message: 'Server error' });
     }
 });
@@ -49,14 +46,13 @@ router.put('/:id', auth, async (req, res) => {
         if (!client) {
             return res.status(404).json({ message: 'Client not found' });
         }
-        client.name = name || client.name;
-        client.dob = dob || client.dob;
-        client.contactNumber = contactNumber || client.contactNumber;
-        client.gp = gp || client.gp;
+        client.name = name;
+        client.dob = dob;
+        client.contactNumber = contactNumber;
+        client.gp = gp;
         await client.save();
         res.json(client);
     } catch (error) {
-        console.error('Error updating client:', error);
         res.status(500).json({ message: 'Server error' });
     }
 });
@@ -64,14 +60,12 @@ router.put('/:id', auth, async (req, res) => {
 // Delete a client by ID
 router.delete('/:id', auth, async (req, res) => {
     try {
-        const client = await Client.findById(req.params.id);
+        const client = await Client.findByIdAndDelete(req.params.id);
         if (!client) {
             return res.status(404).json({ message: 'Client not found' });
         }
-        await client.remove();
         res.json({ message: 'Client removed' });
     } catch (error) {
-        console.error('Error deleting client:', error);
         res.status(500).json({ message: 'Server error' });
     }
 });
