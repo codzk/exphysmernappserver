@@ -4,16 +4,23 @@ const Client = require('../models/Client');
 const auth = require('../middleware/authMiddleware');
 
 // Create a new client
-router.post('/', auth, async (req, res) => {
-    const { name, dob, contactNumber, gp } = req.body;
+router.post('/clients', async (req, res) => {
     try {
-        const newClient = new Client({ name, dob, contactNumber, gp });
-        const client = await newClient.save();
-        res.status(201).json(client);
+        const { name, dob, contact, gp } = req.body;
+
+        if (!name || !dob || !contact || !gp) {
+            return res.status(400).json({ message: 'All fields are required' });
+        }
+
+        const newClient = new Client({ name, dob, contact, gp });
+        await newClient.save();
+        res.status(201).json(newClient);
     } catch (error) {
-        res.status(500).json({ message: 'Server error' });
+        console.error('Error creating client:', error);
+        res.status(500).json({ message: 'Error creating client', error: error.message });
     }
 });
+
 
 // Get all clients
 router.get('/', auth, async (req, res) => {
