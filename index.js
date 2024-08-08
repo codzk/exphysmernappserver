@@ -1,9 +1,12 @@
-
 const express = require('express');
 const mongoose = require('mongoose');
 const cors = require('cors');
 const dotenv = require('dotenv');
 const errorHandler = require('./middleware/errorHandler');
+const contactMessagesRoutes = require('./routes/contactMessages');
+const adminRoutes = require('./routes/adminRoutes');
+const appointmentRoutes = require('./routes/appointmentRoutes');
+const clientRoutes = require('./routes/clientRoutes');
 
 dotenv.config();
 
@@ -14,15 +17,16 @@ app.use(express.json());
 
 // CORS configuration
 app.use(cors({
-  origin: 'https://exphysmernapp.netlify.app', // Replace with your Netlify domain
+  origin: 'https://exphysmernapp.netlify.app',
   methods: ['GET', 'POST', 'PUT', 'DELETE'],
   allowedHeaders: ['Content-Type', 'Authorization']
 }));
 
 // Routes
-app.use('/api/admin', require('./routes/adminRoutes'));
-app.use('/api/appointments', require('./routes/appointmentRoutes'));
-app.use('/api/clients', require('./routes/clientRoutes'));
+app.use('/api/admin', adminRoutes);
+app.use('/api/appointments', appointmentRoutes);
+app.use('/api/clients', clientRoutes);
+app.use('/api/contactMessages', contactMessagesRoutes);
 
 // MongoDB connection
 mongoose.connect(process.env.MONGO_URI, {
