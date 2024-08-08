@@ -1,9 +1,7 @@
 const express = require('express');
 const mongoose = require('mongoose');
-const dotenv = require('dotenv');
 const cors = require('cors');
-const adminRoutes = require('./routes/adminRoutes');
-const appointmentRoutes = require('./routes/appointmentRoutes');
+const dotenv = require('dotenv');
 
 dotenv.config();
 
@@ -11,25 +9,37 @@ const app = express();
 
 // Middleware
 app.use(express.json());
+
+// CORS configuration
+const allowedOrigins = [
+  'http://localhost:3001',
+  'https://exphysmernapp.netlify.app' 
+];
+
 app.use(cors({
-  origin: 'https://exphysmernapp.netlify.app', // Replace with your Netlify domain
+  origin: allowedOrigins,
   methods: ['GET', 'POST', 'PUT', 'DELETE'],
   allowedHeaders: ['Content-Type', 'Authorization']
 }));
 
 // Routes
-app.use('/api/admin', adminRoutes);
-app.use('/api/appointments', appointmentRoutes);
+app.use('/api/admin', require('./routes/adminRoutes'));
+app.use('/api/appointments', require('./routes/appointmentRoutes'));
+app.use('/api/clients', require('./routes/clientRoutes'));
 
-const PORT = process.env.PORT || 5001;
-
+// MongoDB connection
 mongoose.connect(process.env.MONGO_URI, {
   useNewUrlParser: true,
-  useUnifiedTopology: true,
+  useUnifiedTopology: true
 })
   .then(() => console.log('MongoDB connected successfully'))
   .catch((err) => console.log('MongoDB connection error:', err));
 
+// Error handling middleware
+app.use(require('./middleware/errorHandler'));
+
+// Start the server
+const PORT = process.env.PORT || 5001;
 app.listen(PORT, () => {
   console.log(`Server started on port ${PORT}`);
 });
