@@ -13,7 +13,7 @@ app.use(express.json());
 
 // CORS configuration
 app.use(cors({
-  origin: 'https://exphysmernapp.netlify.app', // Replace with your Netlify domain
+  origin: 'https://exphysmernapp.netlify.app',
   methods: ['GET', 'POST', 'PUT', 'DELETE'],
   allowedHeaders: ['Content-Type', 'Authorization']
 }));
