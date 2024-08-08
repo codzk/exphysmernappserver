@@ -78,7 +78,7 @@ router.delete('/:id', auth, async (req, res) => {
         }
 
         // Attempt to find and delete the client
-        const client = await Client.findById(id);
+        const client = await Client.findByIdAndDelete(id);
 
         // If the client does not exist, return a 404 error
         if (!client) {
@@ -86,8 +86,7 @@ router.delete('/:id', auth, async (req, res) => {
             return res.status(404).json({ message: 'Client not found' });
         }
 
-        // Successfully delete the client
-        await client.remove();
+        // Successfully deleted the client
         res.json({ message: 'Client removed' });
     } catch (error) {
         // Log the error for debugging purposes
