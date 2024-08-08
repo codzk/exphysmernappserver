@@ -12,13 +12,13 @@ const app = express();
 // Middleware
 app.use(express.json());
 app.use(cors({
-  origin: 'https://exphysmernapp.netlify.app', 
+  origin: 'https://exphysmernapp.netlify.app', // Replace with your Netlify domain
   methods: ['GET', 'POST', 'PUT', 'DELETE'],
   allowedHeaders: ['Content-Type', 'Authorization']
 }));
 
 // Routes
-app.use('/admin', adminRoutes);
+app.use('/api/admin', adminRoutes);
 app.use('/api/appointments', appointmentRoutes);
 
 const PORT = process.env.PORT || 5001;
