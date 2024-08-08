@@ -4,15 +4,16 @@ const Client = require('../models/Client');
 const auth = require('../middleware/authMiddleware');
 
 // Create a new client
-router.post('/clients', async (req, res) => {
+router.post('/', auth, async (req, res) => {
+    console.log('POST /api/clients route hit'); // Log for debugging
     try {
-        const { name, dob, contact, gp } = req.body;
+        const { name, dob, contactNumber, gp } = req.body;
 
-        if (!name || !dob || !contact || !gp) {
+        if (!name || !dob || !contactNumber || !gp) {
             return res.status(400).json({ message: 'All fields are required' });
         }
 
-        const newClient = new Client({ name, dob, contact, gp });
+        const newClient = new Client({ name, dob, contactNumber, gp });
         await newClient.save();
         res.status(201).json(newClient);
     } catch (error) {
@@ -20,7 +21,6 @@ router.post('/clients', async (req, res) => {
         res.status(500).json({ message: 'Error creating client', error: error.message });
     }
 });
-
 
 // Get all clients
 router.get('/', auth, async (req, res) => {
@@ -67,10 +67,11 @@ router.put('/:id', auth, async (req, res) => {
 // Delete a client by ID
 router.delete('/:id', auth, async (req, res) => {
     try {
-        const client = await Client.findByIdAndDelete(req.params.id);
+        const client = await Client.findById(req.params.id);
         if (!client) {
             return res.status(404).json({ message: 'Client not found' });
         }
+        await client.remove();
         res.json({ message: 'Client removed' });
     } catch (error) {
         res.status(500).json({ message: 'Server error' });
