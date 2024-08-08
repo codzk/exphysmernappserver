@@ -2,6 +2,7 @@ const express = require('express');
 const mongoose = require('mongoose');
 const cors = require('cors');
 const dotenv = require('dotenv');
+const errorHandler = require('./middleware/errorHandler');
 
 dotenv.config();
 
@@ -11,13 +12,8 @@ const app = express();
 app.use(express.json());
 
 // CORS configuration
-const allowedOrigins = [
-  'http://localhost:3001',
-  'https://exphysmernapp.netlify.app' 
-];
-
 app.use(cors({
-  origin: allowedOrigins,
+  origin: 'https://exphysmernapp.netlify.app', // Replace with your Netlify domain
   methods: ['GET', 'POST', 'PUT', 'DELETE'],
   allowedHeaders: ['Content-Type', 'Authorization']
 }));
@@ -36,7 +32,7 @@ mongoose.connect(process.env.MONGO_URI, {
   .catch((err) => console.log('MongoDB connection error:', err));
 
 // Error handling middleware
-app.use(require('./middleware/errorHandler'));
+app.use(errorHandler);
 
 // Start the server
 const PORT = process.env.PORT || 5001;

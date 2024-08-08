@@ -1,6 +1,7 @@
-// Error handling middleware
-app.use((err, req, res, next) => {
-    console.error(err.message);
-    if (!err.statusCode) err.statusCode = 500;
-    res.status(err.statusCode).send(err.message);
-});
+const errorHandler = (err, req, res, next) => {
+    console.error(err.stack);
+    res.status(500).json({ message: 'Server error' });
+  };
+  
+  module.exports = errorHandler;
+  
