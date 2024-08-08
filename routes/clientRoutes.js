@@ -2,6 +2,8 @@ const express = require('express');
 const router = express.Router();
 const Client = require('../models/Client');
 const auth = require('../middleware/authMiddleware');
+const mongoose = require('mongoose');
+const ObjectId = mongoose.Types.ObjectId;
 
 // Create a new client
 router.post('/', auth, async (req, res) => {
@@ -67,14 +69,32 @@ router.put('/:id', auth, async (req, res) => {
 // Delete a client by ID
 router.delete('/:id', auth, async (req, res) => {
     try {
-        const client = await Client.findById(req.params.id);
+        const { id } = req.params;
+
+        // Validate the client ID
+        if (!ObjectId.isValid(id)) {
+            console.error(`Invalid client ID: ${id}`);
+            return res.status(400).json({ message: 'Invalid client ID' });
+        }
+
+        // Attempt to find and delete the client
+        const client = await Client.findById(id);
+
+        // If the client does not exist, return a 404 error
         if (!client) {
+            console.error(`Client not found with ID: ${id}`);
             return res.status(404).json({ message: 'Client not found' });
         }
+
+        // Successfully delete the client
         await client.remove();
         res.json({ message: 'Client removed' });
     } catch (error) {
-        res.status(500).json({ message: 'Server error' });
+        // Log the error for debugging purposes
+        console.error('Error deleting client:', error);
+
+        // Return a 500 error with the error message
+        res.status(500).json({ message: 'Server error', error: error.message });
     }
 });
 
