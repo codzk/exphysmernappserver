@@ -27,4 +27,22 @@ router.get('/', async (req, res) => {
     }
 });
 
+router.delete('/:id', async (req, res) => {
+    try {
+        const { id } = req.params;
+        console.log('Attempting to delete contact message with ID:', id);
+        const message = await ContactMessage.findByIdAndDelete(id);
+        if (!message) {
+            console.log('Contact message not found');
+            return res.status(404).json({ message: 'Contact message not found' });
+        }
+        console.log('Contact message deleted successfully');
+        res.status(200).json({ message: 'Contact message deleted successfully' });
+    } catch (error) {
+        console.error('Error deleting contact message:', error);
+        res.status(500).json({ message: 'Server error' });
+    }
+});
+
+
 module.exports = router;
