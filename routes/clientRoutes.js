@@ -6,7 +6,6 @@ const ObjectId = mongoose.Types.ObjectId;
 
 // Create a new client
 router.post('/', async (req, res) => {
-    console.log('POST /api/clients route hit'); // Log for debugging
     try {
         const { name, dob, contactNumber, gp } = req.body;
 
@@ -29,6 +28,7 @@ router.get('/', async (req, res) => {
         const clients = await Client.find();
         res.json(clients);
     } catch (error) {
+        console.error('Error fetching clients:', error);
         res.status(500).json({ message: 'Server error' });
     }
 });
@@ -42,6 +42,7 @@ router.get('/:id', async (req, res) => {
         }
         res.json(client);
     } catch (error) {
+        console.error('Error fetching client:', error);
         res.status(500).json({ message: 'Server error' });
     }
 });
@@ -50,7 +51,7 @@ router.get('/:id', async (req, res) => {
 router.put('/:id', async (req, res) => {
     const { name, dob, contactNumber, gp } = req.body;
     try {
-        let client = await Client.findById(req.params.id);
+        const client = await Client.findById(req.params.id);
         if (!client) {
             return res.status(404).json({ message: 'Client not found' });
         }
@@ -61,6 +62,7 @@ router.put('/:id', async (req, res) => {
         await client.save();
         res.json(client);
     } catch (error) {
+        console.error('Error updating client:', error);
         res.status(500).json({ message: 'Server error' });
     }
 });
@@ -70,28 +72,18 @@ router.delete('/:id', async (req, res) => {
     try {
         const { id } = req.params;
 
-        // Validate the client ID
         if (!ObjectId.isValid(id)) {
-            console.error(`Invalid client ID: ${id}`);
             return res.status(400).json({ message: 'Invalid client ID' });
         }
 
-        // Attempt to find and delete the client
         const client = await Client.findByIdAndDelete(id);
-
-        // If the client does not exist, return a 404 error
         if (!client) {
-            console.error(`Client not found with ID: ${id}`);
             return res.status(404).json({ message: 'Client not found' });
         }
 
-        // Successfully deleted the client
         res.json({ message: 'Client removed' });
     } catch (error) {
-        // Log the error for debugging purposes
         console.error('Error deleting client:', error);
-
-        // Return a 500 error with the error message
         res.status(500).json({ message: 'Server error', error: error.message });
     }
 });
